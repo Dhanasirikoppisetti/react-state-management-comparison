@@ -1,6 +1,7 @@
 import { useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectCartItemCount, selectCartIsOpen, toggleCart } from '../store/cartSlice';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectCartItemCount } from '../store/cartSlice';
 
 // useSelector with a precise selector — only re-renders when item count changes
 export default function CartItemCount() {
@@ -8,17 +9,15 @@ export default function CartItemCount() {
   renderCount.current += 1;
 
   const totalQty = useSelector(selectCartItemCount);
-  const isOpen = useSelector(selectCartIsOpen);
-  const dispatch = useDispatch();
 
   return (
     <div style={{ position: 'relative' }}>
-      <button
+      <Link
+        to="/cart"
         className="cart-btn"
-        onClick={() => dispatch(toggleCart())}
-        aria-label="Toggle bunny basket"
-        aria-expanded={isOpen}
+        aria-label="View bunny basket"
         title="My Bunny Basket"
+        style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
       >
         🧺
         {totalQty > 0 && (
@@ -26,7 +25,7 @@ export default function CartItemCount() {
             {totalQty}
           </span>
         )}
-      </button>
+      </Link>
       {import.meta.env.DEV && (
         <small
           className="render-count-badge"

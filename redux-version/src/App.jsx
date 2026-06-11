@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectTheme } from './store/uiSlice';
+import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import ProductListPage from './components/ProductListPage';
-import CartSidebar from './components/CartSidebar';
+import CartPage from './components/CartPage';
+import CheckoutPage from './components/CheckoutPage';
 import Notification from './components/Notification';
 
 function ThemeApplier({ children }) {
@@ -24,10 +26,13 @@ export default function App() {
         <Header />
 
         <main className="main-content page-content-wrapper">
-          <ProductListPage />
+          <Routes>
+            <Route path="/" element={<ProductListPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+          </Routes>
         </main>
 
-        <CartSidebar />
         <Notification />
 
         {import.meta.env.DEV && (

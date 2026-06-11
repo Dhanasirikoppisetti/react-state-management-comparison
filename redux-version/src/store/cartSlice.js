@@ -1,16 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const getInitialCart = () => {
+  try {
+    const saved = localStorage.getItem('bunny_cart_redux');
+    return saved ? JSON.parse(saved) : [];
+  } catch (e) {
+    return [];
+  }
+};
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
-    items: [],
+    items: getInitialCart(),
     isOpen: false,
   },
   reducers: {
-    /**
-     * addItemToCart — adds a product or increments quantity.
-     * Immer (built into RTK) lets us "mutate" the draft state safely.
-     */
     addItemToCart(state, action) {
       const product = action.payload;
       const existing = state.items.find(i => i.productId === product.productId);
@@ -33,12 +38,13 @@ const cartSlice = createSlice({
 
     updateQuantity(state, action) {
       const { productId, quantity } = action.payload;
-      if (quantity <= 0) {
-        state.items = state.items.filter(i => i.productId !== productId);
-        return;
-      }
+      const safeQty = Math.max(1, quantity);
       const item = state.items.find(i => i.productId === productId);
-      if (item) item.quantity = quantity;
+      if (item) item.quantity = safeQty;
+    },
+
+    clearCart(state) {
+      state.items = [];
     },
 
     toggleCart(state) {
@@ -59,6 +65,7 @@ export const {
   addItemToCart,
   removeFromCart,
   updateQuantity,
+  clearCart,
   toggleCart,
   openCart,
   closeCart,

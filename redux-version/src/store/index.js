@@ -20,4 +20,12 @@ const store = configureStore({
   },
 });
 
+try {
+  store.subscribe(() => {
+    localStorage.setItem('bunny_cart_redux', JSON.stringify(store.getState().cart.items));
+  });
+} catch (e) {
+  console.error('Failed to subscribe to Redux store updates', e);
+}
+
 export default store;

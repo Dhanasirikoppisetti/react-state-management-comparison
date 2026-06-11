@@ -23,6 +23,7 @@ export function useCart() {
       removeFromCart: (productId) => dispatch({ type: 'REMOVE_FROM_CART', payload: { productId } }),
       updateQuantity: (productId, quantity) => dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } }),
       toggleCart: () => dispatch({ type: 'TOGGLE_CART' }),
+      clearCart: () => dispatch({ type: 'CLEAR_CART' }),
     };
   }
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -34,6 +35,7 @@ export function useCart() {
     removeFromCart: (productId) => dispatch({ type: 'REMOVE_FROM_CART', payload: { productId } }),
     updateQuantity: (productId, quantity) => dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } }),
     toggleCart: () => dispatch({ type: 'TOGGLE_CART' }),
+    clearCart: () => dispatch({ type: 'CLEAR_CART' }),
   };
 }
 

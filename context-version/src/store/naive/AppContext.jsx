@@ -1,9 +1,19 @@
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useReducer, useEffect } from 'react';
+
+// ── LocalStorage Helper ──────────────────────────────────────────────────────
+const getInitialCart = () => {
+  try {
+    const saved = localStorage.getItem('bunny_cart');
+    return saved ? JSON.parse(saved) : [];
+  } catch (e) {
+    return [];
+  }
+};
 
 // ── Initial State ─────────────────────────────────────────────────────────────
 const initialState = {
   cart: {
-    items: [],
+    items: getInitialCart(),
     isOpen: false,
   },
   user: {
@@ -40,14 +50,14 @@ function appReducer(state, action) {
     }
     case 'UPDATE_QUANTITY': {
       const { productId, quantity } = action.payload;
-      if (quantity <= 0) {
-        const items = state.cart.items.filter(i => i.productId !== productId);
-        return { ...state, cart: { ...state.cart, items } };
-      }
+      const safeQty = Math.max(1, quantity);
       const items = state.cart.items.map(i =>
-        i.productId === productId ? { ...i, quantity } : i
+        i.productId === productId ? { ...i, quantity: safeQty } : i
       );
       return { ...state, cart: { ...state.cart, items } };
+    }
+    case 'CLEAR_CART': {
+      return { ...state, cart: { ...state.cart, items: [] } };
     }
     case 'TOGGLE_CART':
       return { ...state, cart: { ...state.cart, isOpen: !state.cart.isOpen } };
@@ -72,6 +82,15 @@ export const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('bunny_cart', JSON.stringify(state.cart.items));
+    } catch (e) {
+      console.error('Failed to save cart to localStorage', e);
+    }
+  }, [state.cart.items]);
+
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       {children}

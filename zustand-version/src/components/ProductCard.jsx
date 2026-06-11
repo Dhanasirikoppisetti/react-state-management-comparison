@@ -6,17 +6,18 @@ export default function ProductCard({ product }) {
   const renderCount = useRef(0);
   renderCount.current += 1;
 
-  const [justAdded, setJustAdded] = useState(false);
-
   // Stable action references — these never change so they don't cause re-renders
   const addToCart = useAppStore(state => state.addToCart);
   const setNotification = useAppStore(state => state.setNotification);
 
+  // Subscribe to derived boolean: only re-renders when this product's presence in cart changes
+  const isInCart = useAppStore(state =>
+    state.cart.items.some(i => i.productId === product.productId)
+  );
+
   function handleAdd() {
     addToCart(product);
     setNotification(`${product.emoji} ${product.name} added to your basket!`, 'success');
-    setJustAdded(true);
-    setTimeout(() => setJustAdded(false), 1500);
   }
 
   return (
@@ -46,11 +47,11 @@ export default function ProductCard({ product }) {
         <div className="product-footer">
           <div className="product-price">₹{product.price.toFixed(2)}</div>
           <button
-            className={`btn-add-to-cart ${justAdded ? 'added' : ''}`}
+            className={`btn-add-to-cart ${isInCart ? 'added' : ''}`}
             onClick={handleAdd}
             aria-label={`Add ${product.name} to basket`}
           >
-            {justAdded ? '✓ In Basket!' : '🧺 Add to Basket'}
+            {isInCart ? 'Added to Cart ✓' : '🧺 Add to Basket'}
           </button>
         </div>
       </div>

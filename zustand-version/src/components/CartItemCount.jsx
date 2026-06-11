@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 
 export default function CartItemCount() {
@@ -9,17 +10,15 @@ export default function CartItemCount() {
   const totalQty = useAppStore(state =>
     state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
   );
-  const isOpen = useAppStore(state => state.cart.isOpen);
-  const toggleCart = useAppStore(state => state.toggleCart);
 
   return (
     <div style={{ position: 'relative' }}>
-      <button
+      <Link
+        to="/cart"
         className="cart-btn"
-        onClick={toggleCart}
-        aria-label="Toggle bunny basket"
-        aria-expanded={isOpen}
+        aria-label="View bunny basket"
         title="My Bunny Basket"
+        style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
       >
         🧺
         {totalQty > 0 && (
@@ -27,7 +26,7 @@ export default function CartItemCount() {
             {totalQty}
           </span>
         )}
-      </button>
+      </Link>
       {import.meta.env.DEV && (
         <small
           className="render-count-badge"

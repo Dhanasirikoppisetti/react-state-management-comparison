@@ -1,25 +1,25 @@
-import { useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { addItemToCart } from '../store/cartSlice';
 import { setNotification } from '../store/uiSlice';
 
 /**
- * ProductCard does NOT call useSelector — it only dispatches actions.
- * This means it will NOT re-render when cart or user state changes.
- * useDispatch returns a stable reference — no re-renders from that either.
+ * ProductCard uses a precise primitive selector to check if this product
+ * is in the cart, re-rendering only when that boolean changes.
  */
 export default function ProductCard({ product }) {
   const renderCount = useRef(0);
   renderCount.current += 1;
 
-  const [justAdded, setJustAdded] = useState(false);
   const dispatch = useDispatch();
+
+  const isInCart = useSelector(state =>
+    state.cart.items.some(i => i.productId === product.productId)
+  );
 
   function handleAdd() {
     dispatch(addItemToCart(product));
     dispatch(setNotification({ message: `${product.emoji} ${product.name} added to your basket!`, type: 'success' }));
-    setJustAdded(true);
-    setTimeout(() => setJustAdded(false), 1500);
   }
 
   return (
@@ -49,11 +49,11 @@ export default function ProductCard({ product }) {
         <div className="product-footer">
           <div className="product-price">₹{product.price.toFixed(2)}</div>
           <button
-            className={`btn-add-to-cart ${justAdded ? 'added' : ''}`}
+            className={`btn-add-to-cart ${isInCart ? 'added' : ''}`}
             onClick={handleAdd}
             aria-label={`Add ${product.name} to basket`}
           >
-            {justAdded ? '✓ In Basket!' : '🧺 Add to Basket'}
+            {isInCart ? 'Added to Cart ✓' : '🧺 Add to Basket'}
           </button>
         </div>
       </div>

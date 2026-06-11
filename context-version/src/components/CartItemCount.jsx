@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useCart } from '../store/storeHooks';
 import { CONTEXT_MODE } from '../store/config';
 
@@ -6,17 +7,17 @@ export default function CartItemCount() {
   const renderCount = useRef(0);
   renderCount.current += 1;
 
-  const { items, isOpen, toggleCart } = useCart();
+  const { items } = useCart();
   const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div style={{ position: 'relative' }}>
-      <button
+      <Link
+        to="/cart"
         className="cart-btn"
-        onClick={toggleCart}
-        aria-label="Toggle bunny basket"
-        aria-expanded={isOpen}
+        aria-label="View bunny basket"
         title="My Bunny Basket"
+        style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
       >
         🧺
         {totalQty > 0 && (
@@ -24,7 +25,7 @@ export default function CartItemCount() {
             {totalQty}
           </span>
         )}
-      </button>
+      </Link>
       {import.meta.env.DEV && (
         <small
           className="render-count-badge"

@@ -7,15 +7,14 @@ export default function ProductCard({ product }) {
   const renderCount = useRef(0);
   renderCount.current += 1;
 
-  const [justAdded, setJustAdded] = useState(false);
-  const { addToCart } = useCart();
+  const { items, addToCart } = useCart();
   const { setNotification } = useUI();
+
+  const isInCart = items.some(i => i.productId === product.productId);
 
   function handleAdd() {
     addToCart(product);
     setNotification(`${product.emoji} ${product.name} added to your basket!`, 'success');
-    setJustAdded(true);
-    setTimeout(() => setJustAdded(false), 1500);
   }
 
   return (
@@ -47,11 +46,11 @@ export default function ProductCard({ product }) {
             ₹{product.price.toFixed(2)}
           </div>
           <button
-            className={`btn-add-to-cart ${justAdded ? 'added' : ''}`}
+            className={`btn-add-to-cart ${isInCart ? 'added' : ''}`}
             onClick={handleAdd}
             aria-label={`Add ${product.name} to basket`}
           >
-            {justAdded ? '✓ In Basket!' : '🧺 Add to Basket'}
+            {isInCart ? 'Added to Cart ✓' : '🧺 Add to Basket'}
           </button>
         </div>
       </div>

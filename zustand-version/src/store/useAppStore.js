@@ -10,10 +10,27 @@ import { create } from 'zustand';
  *   const isOpen = useAppStore(state => state.cart.isOpen);
  *   // ^ Only re-renders when isOpen changes, not on any other state update!
  */
+const getInitialCart = () => {
+  try {
+    const saved = localStorage.getItem('bunny_cart_zustand');
+    return saved ? JSON.parse(saved) : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+const saveCart = (items) => {
+  try {
+    localStorage.setItem('bunny_cart_zustand', JSON.stringify(items));
+  } catch (e) {
+    console.error('Failed to save cart to localStorage', e);
+  }
+};
+
 const useAppStore = create((set) => ({
   // ── State ──────────────────────────────────────────────────────────────────
   cart: {
-    items: [],
+    items: getInitialCart(),
     isOpen: false,
   },
   user: {
@@ -45,33 +62,44 @@ const useAppStore = create((set) => ({
               emoji: product.emoji,
             },
           ];
+      saveCart(items);
       return { cart: { ...state.cart, items } };
     }),
 
   removeFromCart: (productId) =>
-    set((state) => ({
-      cart: {
-        ...state.cart,
-        items: state.cart.items.filter(i => i.productId !== productId),
-      },
-    })),
-
-  updateQuantity: (productId, quantity) =>
     set((state) => {
-      if (quantity <= 0) {
-        return {
-          cart: {
-            ...state.cart,
-            items: state.cart.items.filter(i => i.productId !== productId),
-          },
-        };
-      }
+      const items = state.cart.items.filter(i => i.productId !== productId);
+      saveCart(items);
       return {
         cart: {
           ...state.cart,
-          items: state.cart.items.map(i =>
-            i.productId === productId ? { ...i, quantity } : i
-          ),
+          items,
+        },
+      };
+    }),
+
+  updateQuantity: (productId, quantity) =>
+    set((state) => {
+      const safeQty = Math.max(1, quantity);
+      const items = state.cart.items.map(i =>
+        i.productId === productId ? { ...i, quantity: safeQty } : i
+      );
+      saveCart(items);
+      return {
+        cart: {
+          ...state.cart,
+          items,
+        },
+      };
+    }),
+
+  clearCart: () =>
+    set((state) => {
+      saveCart([]);
+      return {
+        cart: {
+          ...state.cart,
+          items: [],
         },
       };
     }),
